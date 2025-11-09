@@ -20,7 +20,7 @@ class AISong(db.Model):
 @app.route ("/playlist", methods=["GET"])
 def call_suno():
 # if request.method == "GET":
-   # response = make_song()
+    response = make_song()
     return "HELLO"
 
 @app.route("/playlist", methods=["POST"])
@@ -64,3 +64,5 @@ def index():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
+    
