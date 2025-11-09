@@ -46,7 +46,9 @@ def display_song():
                 with open(filename, "wb") as f:
                     f.write(r.content)
                 print(f"Saved {filename}")
+        return "COOL MAN. IT DID IT"
     else:
+        return "NOT COOL DUDE"
         print(f"Task failed: {data.get('msg')}")
     return "DONE"
             
