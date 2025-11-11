@@ -106,6 +106,7 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+from helper_functions.song_maker import make_song
 
 load_dotenv()
 
@@ -133,8 +134,12 @@ with app.app_context():
 def index():
     return render_template("index.html")
 
-@app.route("/playlist", methods=["POST"])
+@app.route("/playlist", methods=["POST","GET"])
 def handle_callback():
+    if request.method == "GET":
+         # Trigger Suno song generation
+        make_song()
+        return render_template("playlist.html")
     data = request.json or {}
     print("Received callback:", data)
 
