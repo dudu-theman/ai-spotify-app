@@ -11,7 +11,7 @@
 {% block body %}
 
 {% for song in songurls %}
-<h3>{{song.s3_url}}</h3>            
+<li><strong>{{ song.title }}</strong> — <a href="{{ song.audio_url }}" target="_blank">{{ song.audio_url }}</a></li>         
 {% endfor %}
 
 {% endblock %}
