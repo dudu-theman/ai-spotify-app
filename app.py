@@ -185,7 +185,7 @@ def handle_callback():
                 BytesIO(response.content),
                 AWS_BUCKET_NAME,
                 file_name,
-                ExtraArgs={"ContentType": "audio/mpeg", "ACL": "public-read"}
+                ExtraArgs={"ContentType": "audio/mpeg"}
             )
 
             # 3️⃣ Construct the S3 URL
