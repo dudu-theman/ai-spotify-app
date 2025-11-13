@@ -107,8 +107,24 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 from helper_functions.song_maker import make_song
+import boto3
+from io import BytesIO
+import requests
+from werkzeug.utils import secure_filename
 
 load_dotenv()
+
+AWS_ACCESS_KEY_ID=os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY=os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION=os.getenv("AWS_REGION")
+AWS_BUCKET_NAME=os.getenv("AWS_BUCKET_NAME")
+
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    region_name=AWS_REGION
+)
 
 app = Flask(__name__)
 
@@ -157,11 +173,30 @@ def handle_callback():
                 print(f"Skipping {title}: no audio_url")
                 continue
 
-            new_song = AISong(title=title, audio_url=audio_url, task_id=task_id)
+            # 1️⃣ Download MP3 from Suno
+            response = requests.get(audio_url)
+            if response.status_code != 200:
+                print(f"Failed to download {title}")
+                continue
+
+            # 2️⃣ Upload to your S3 bucket
+            file_name = secure_filename(f"{title}.mp3")
+            s3.upload_fileobj(
+                BytesIO(response.content),
+                AWS_BUCKET_NAME,
+                file_name,
+                ExtraArgs={"ContentType": "audio/mpeg", "ACL": "public-read"}
+            )
+
+            # 3️⃣ Construct the S3 URL
+            s3_url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
+
+            # 4️⃣ Save that URL in the database
+            new_song = AISong(title=title, audio_url=s3_url, task_id=task_id)
             db.session.add(new_song)
-        
-        db.session.commit()
-        print(f"Added {len(music_data)} songs to database.")
+
+        db.session.commit()   
+        print(f"Uploaded {len(music_data)} songs to S3 and saved to database.")
 
     return "Callback processed"
 
