@@ -4,7 +4,7 @@ function ViewSongsButton() {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/api/songs");
+        navigate("/showsongs");
     }
 
     return (

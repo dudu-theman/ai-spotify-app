@@ -97,14 +97,15 @@ def callback():
 def api_songs():
     songs = AISong.query.all()
 
-    return jsonify([
-        {
+    result = []
+    for s in songs:
+        result.append({
             "id": s.id,
             "title": s.title,
             "audio_url": s.audio_url
-        }
-        for s in songs
-    ]), 200
+        })
+
+    return jsonify(result), 200
 
 
 if __name__ == "__main__":
