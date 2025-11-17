@@ -24,9 +24,9 @@ s3 = boto3.client(
     region_name=AWS_REGION
 )
 
-# ----------------- FLASK + DB SETUP -----------------
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -38,13 +38,11 @@ class AISong(db.Model):
     title = db.Column(db.String(150))
     audio_url = db.Column(db.String(300))
 
-# Create tables (DO NOT drop_on_restart)
+
 with app.app_context():
     db.create_all()
 
-# -----------------------------------------------------
-# ROUTE 1 — React frontend health check
-# -----------------------------------------------------
+
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "backend running"}), 200
@@ -95,9 +93,6 @@ def callback():
     return "Callback processed", 200
 
 
-# -----------------------------------------------------
-# ROUTE 4 — React fetches all songs from here
-# -----------------------------------------------------
 @app.route("/api/songs", methods=["GET"])
 def api_songs():
     songs = AISong.query.all()
@@ -112,9 +107,6 @@ def api_songs():
     ]), 200
 
 
-# -----------------------------------------------------
-# RUN SERVER
-# -----------------------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
