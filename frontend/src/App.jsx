@@ -12,8 +12,10 @@ function App() {
       const res = await fetch(`${BASE_URL}/generate?q=${query}`, { method: "POST" });
       const data = await res.json();
       console.log("Results:", data);
+      alert("Song is generating");
     } catch (error) {
       console.error("Error fetching search results", error);
+      alert("Error generating song");
     }
   }
 
