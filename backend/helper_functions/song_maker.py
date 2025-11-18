@@ -6,7 +6,8 @@ from anthropic import Anthropic
 
 load_dotenv()
 
-client = Anthropic()
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 api_key = os.getenv("SUNO_API_KEY")
 url = "https://api.sunoapi.org/api/v1/generate"
