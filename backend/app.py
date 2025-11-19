@@ -69,7 +69,7 @@ def callback():
         song = songs_data[0]
      #   for i, song in enumerate(songs_data):
 
-        title = song.get("title", f"Song_{i}")
+        title = song.get("title","Song is missing title")
         audio_url = song.get("audio_url")
 
         if not audio_url:
@@ -82,13 +82,13 @@ def callback():
         s3.upload_fileobj(
             BytesIO(response.content),
             AWS_BUCKET_NAME,
-            f"{i}{file_name}",
+            f"{file_name}",
             ExtraArgs={"ContentType": "audio/mpeg"}
         )
 
         # construct S3 URL and save in DB
         s3_url = (
-            f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{i}{file_name}"
+            f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
         )
         new_song = AISong(title=title, audio_url=s3_url)
         db.session.add(new_song)
