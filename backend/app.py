@@ -41,6 +41,12 @@ class AISong(db.Model):
     audio_url = db.Column(db.String(300))
     song_id = db.Column(db.String(300))
 
+class Users(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    firebase_uid = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+
 
 with app.app_context():
     db.drop_all()
@@ -103,6 +109,26 @@ def callback():
 
     return "Callback processed", 200
 
+@app.route("/login", methods=["GET","POST"])
+def verify_identity():
+    pass
+
+@app.route("/signup", methods=["GET","POST"])
+def create_account():
+    data = request.json
+    firebase_uid = data.get("firebase_uid")
+    username = data.get("username")
+
+    if not firebase_uid or not username:
+        return {"error": "Missing fields"}, 400
+
+    new_user = Users(firebase_uid=firebase_uid, username=username)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return {"message": "User created successfully"}, 200
+
+
 
 @app.route("/api/songs", methods=["GET"])
 def api_songs():
@@ -122,3 +148,6 @@ def api_songs():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+# Firebase, Clerk for authentication

@@ -1,7 +1,8 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import ShowSongs from "./pages/ShowSongs.jsx";
-import SearchBar from "./components/SearchBar.jsx"
+import SearchBar from "./components/SearchBar.jsx";
+import AuthPage from "./pages/AuthPage.jsx";
 
 const BASE_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -19,9 +20,12 @@ function App() {
     }
   }
 
+  const location = useLocation();
+  const showSearchBar = location.pathname !== "/auth";
+
   return (
     <>
-      <SearchBar onSearch={handleSearch}/>
+      {showSearchBar && <SearchBar onSearch={handleSearch}/>}
       <Routes>
         <Route path="/" element={<Navigate to="/auth" />} />
         <Route path="/auth" element={<AuthPage/>} />
