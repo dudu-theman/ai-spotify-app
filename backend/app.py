@@ -116,17 +116,17 @@ def verify_identity():
     password = data.get("password")
 
     if not username or not password:
-        return {"message": "Missing fields"}, 400
+        return jsonify({"message": "Missing fields"}), 400
     
     existing = Users.query.filter_by(username=username).first()
     if not existing:
-        return {"message": "Username doesn't exist"}, 400
+        return jsonify({"message": "Username doesn't exist"}), 400
 
     if existing.password != password:
-        return {"message": "Incorrect password"}, 400
+        return jsonify({"message": "Incorrect password"}), 400
 
     else:
-        return {"login successful"}, 200
+        return jsonify({"login successful"}), 200
 
 @app.route("/signup", methods=["GET","POST"])
 def create_account():
@@ -135,18 +135,18 @@ def create_account():
     password = data.get("password")
 
     if not username or not password:
-        return {"message": "Missing fields"}, 400
+        return jsonify({"message": "Missing fields"}), 400
 
 
     existing = Users.query.filter_by(username=username).first()
     if existing:
-        return {"message": "Username already exists"}, 400
+        return jsonify({"message": "Username already exists"}), 400
 
     new_user = Users(username=username, password=password)
     db.session.add(new_user)
     db.session.commit()
     print("SUCCESFUL")
-    return {"message": "User created successfully"}, 200
+    return jsonify({"message": "User created successfully"}), 200
 
 
 

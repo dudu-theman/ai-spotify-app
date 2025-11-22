@@ -30,7 +30,7 @@ function LoginForm() {
                 setError("");
                 navigate("/home");
             }
-        } catch {
+        } catch(err) {
             console.error(err);
             setError("Unexpected error occurred");
         }
