@@ -126,7 +126,7 @@ def verify_identity():
         return jsonify({"message": "Incorrect password"}), 400
 
     else:
-        return jsonify({"login successful"}), 200
+        return jsonify({"message": "login successful"}), 200
 
 @app.route("/signup", methods=["GET","POST"])
 def create_account():
