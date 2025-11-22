@@ -1,41 +1,67 @@
-import { useState } from "react";
-const BASE_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+import {useState} from "react";
 
-function SignupForm () {
+// const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const BASE_URL = "http://localhost:5000";
+
+function SignupForm(props) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const res = await fetch(`${BASE_URL}/signup`, {
-            method: "POST",
-            headers: {"Content-Type:": "application/json"},
-            body: JSON.stringify({ username, password})
-        });
+        try {
+            const res = await fetch(`${BASE_URL}/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
 
-        const data = await res.json();
-        console.log("Account created!", data); 
+            const data = await res.json();
+
+            if (res.status != 200) {
+                console.log(data.message);
+                setError(data.message);
+                return;
+            } else {
+                console.log(data.message);
+                setError("");
+                props.onSignupSuccess();
+            }
+
+        } catch (err) {
+            setError("Unexpected error ocurred");
+        }
     }
 
-    return (
-       <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                placeholder="Choose a username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-            
-            <input
-                type="password"
-                placeholder="Choose a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="submit">Create Account</button>
-        </form>
+
+    return(
+        <>
+            <form onSubmit={handleSubmit}>
+                <h3>Sign Up</h3>
+                
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button type="submit">
+                    Create Account
+                </button>
+            </form>
+
+            {error && <p>{error}</p>}
+        </>
     );
 }
 
-export default SignupForm;
+export default SignupForm

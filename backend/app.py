@@ -44,8 +44,8 @@ class AISong(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    firebase_uid = db.Column(db.String(100), unique=True, nullable=False)
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), unique=True, nullable=False)
 
 
 with app.app_context():
@@ -111,21 +111,41 @@ def callback():
 
 @app.route("/login", methods=["GET","POST"])
 def verify_identity():
-    pass
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return {"message": "Missing fields"}, 400
+    
+    existing = Users.query.filter_by(username=username).first()
+    if not existing:
+        return {"message": "Username doesn't exist"}, 400
+
+    if existing.password != password:
+        return {"message": "Incorrect password"}, 400
+
+    else:
+        return {"login successful"}, 200
 
 @app.route("/signup", methods=["GET","POST"])
 def create_account():
-    data = request.json
-    firebase_uid = data.get("firebase_uid")
+    data = request.get_json()
     username = data.get("username")
+    password = data.get("password")
 
-    if not firebase_uid or not username:
-        return {"error": "Missing fields"}, 400
+    if not username or not password:
+        return {"message": "Missing fields"}, 400
 
-    new_user = Users(firebase_uid=firebase_uid, username=username)
+
+    existing = Users.query.filter_by(username=username).first()
+    if existing:
+        return {"message": "Username already exists"}, 400
+
+    new_user = Users(username=username, password=password)
     db.session.add(new_user)
     db.session.commit()
-
+    print("SUCCESFUL")
     return {"message": "User created successfully"}, 200
 
 
