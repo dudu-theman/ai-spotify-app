@@ -84,7 +84,7 @@ def generate_song():
         return jsonify({"message": "Suno API error"}), 500
     
     task_id = response["data"]["taskId"]
-    print(f"GENERATED TASK ID IS {task_id}")
+    print(f"GENERATED TASK ID IS {task_id}",flush=True)
     task_to_user[task_id] = g.current_user.id  # store mapping
 
     return jsonify({"message": "Generation started"}), 200
@@ -95,7 +95,7 @@ def callback():
     data = request.json or {}
     songs_data = data.get("data", {}).get("data", [])
     task_id = data.get("taskId")
-    print(f"TASK ID FOR CALLBACK IS {task_id}")
+    print(f"TASK ID FOR CALLBACK IS {task_id}", flush=True)
 
     if not task_id:
         return "Missing task_id", 400
