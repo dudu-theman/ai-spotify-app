@@ -6,7 +6,9 @@ function ShowSongs () {
 
     useEffect(() => {
         async function loadSongs() {
-            const res = await fetch("https://lofi-app-dc75.onrender.com/api/songs/private")
+            const res = await fetch("https://lofi-app-dc75.onrender.com/api/songs/private", 
+                { credentials: "include" }
+            )
             const data = await res.json();
             setSongs(data);
         }

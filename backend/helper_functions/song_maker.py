@@ -62,5 +62,5 @@ def make_title_name(query):
     )
     return response.content[0].text 
     
-# print(make_title_name("Calm lofi beat with rain and wind sounds in the background."))
+print(make_title_name("Calm lofi beat with rain and wind sounds in the background."))
 # train model title
