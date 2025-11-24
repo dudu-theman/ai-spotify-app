@@ -95,6 +95,7 @@ def callback():
     data = request.json or {}
     songs_data = data.get("data", {}).get("data", [])
     task_id = data.get("taskId")
+    print(f"DATA IS {data}", flush=True)
     print(f"TASK ID FOR CALLBACK IS {task_id}", flush=True)
 
     if not task_id:
