@@ -112,6 +112,8 @@ def callback():
 @app.route("/login", methods=["GET","POST"])
 def verify_identity():
     data = request.get_json()
+    if not data:
+        return jsonify({"message": "invalid JSON"}), 500
     username = data.get("username")
     password = data.get("password")
 
@@ -131,6 +133,9 @@ def verify_identity():
 @app.route("/signup", methods=["GET","POST"])
 def create_account():
     data = request.get_json()
+
+    if not data:
+        return jsonify({"message": "invalid JSON"}), 500
     username = data.get("username")
     password = data.get("password")
 
