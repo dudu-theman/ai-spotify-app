@@ -10,7 +10,10 @@ function App() {
 
   const handleSearch = async (query) => {
     try {
-      const res = await fetch(`${BASE_URL}/generate?q=${query}`, { method: "POST" });
+      const res = await fetch(`${BASE_URL}/generate?q=${query}`, { 
+        method: "POST",
+        credentials: "include" 
+      });
       const data = await res.json();
       console.log("Results:", data);
       alert("Song is generating");
