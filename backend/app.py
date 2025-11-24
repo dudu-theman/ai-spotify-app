@@ -70,19 +70,36 @@ def load_current_user():
         g.current_user = None
 
 
+task_to_user = {}
+
 @app.route("/generate", methods=["POST"])
 def generate_song():
     query = request.args.get("q")
-    make_song(query)
+    if not g.current_user:
+        return jsonify({"message": "Please log in"}), 401
+    response = make_song(query)
+    if response.get("code") != 200:
+        return jsonify({"message": "Suno API error"}), 500
+    
+    task_id = response["data"]["taskId"]
+    task_to_user[task_id] = g.current_user.id  # store mapping
+
     return jsonify({"message": "Generation started"}), 200
 
 
 @app.route("/callback", methods=["POST"])
 def callback():
     data = request.json or {}
-    print("Received callback:", data)
-
     songs_data = data.get("data", {}).get("data", [])
+    task_id = data.get("taskId")
+
+    if not task_id:
+        return "Missing task_id", 400
+    
+    user_id = task_to_user.pop(task_id, None)
+    if not user_id:
+        print("Unknown task_id:", task_id)
+        return "Unknown task", 400
 
     if data.get("code") == 200:
         song = songs_data[0]
@@ -115,10 +132,7 @@ def callback():
             f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
         )
 
-
-        if not g.current_user:
-            return jsonify({"message": "User must be logged in to create a song"}), 401
-        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=g.current_user.id)
+        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=user_id)
         db.session.add(new_song)
         db.session.commit()
 
