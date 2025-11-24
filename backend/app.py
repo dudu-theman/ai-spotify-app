@@ -33,6 +33,8 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
 db = SQLAlchemy(app)
 
 class AISong(db.Model):
