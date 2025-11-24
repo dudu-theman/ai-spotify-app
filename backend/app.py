@@ -181,7 +181,6 @@ def create_account():
     new_user = Users(username=username, password=password)
     db.session.add(new_user)
     db.session.commit()
-    print("SUCCESFUL")
     return jsonify({"message": "User created successfully"}), 200
 
 

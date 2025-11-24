@@ -41,7 +41,11 @@ def make_song(query):
         "callBackUrl": "https://lofi-app-dc75.onrender.com/callback"
     }
     response = requests.post(url, json=payload, headers=headers)
-    return response
+    try:
+        return response.json()
+    except Exception as e:
+        print("Error decoding Suno response:", e, response.text)
+        return {"code": 500, "msg": "Failed to decode Suno response"}
 
 def make_title_name(query):
     prompt = (f"I am generating a song with the following prompt: <prompt>{query}</prompt>. " 
