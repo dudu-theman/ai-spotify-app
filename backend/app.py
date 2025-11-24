@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import os
@@ -40,12 +40,15 @@ class AISong(db.Model):
     title = db.Column(db.String(150))
     audio_url = db.Column(db.String(300))
     song_id = db.Column(db.String(300))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=True)
+    owner = db.relationship("Users", backref="songs")
 
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
+  
 
 
 with app.app_context():
@@ -56,6 +59,14 @@ with app.app_context():
 @app.route("/", methods=["GET"])
 def root():
     return jsonify({"status": "backend running"}), 200
+
+@app.before_request
+def load_current_user():
+    user_id = session.get('user_id')
+    if user_id:
+        g.current_user = Users.query.get(user_id)
+    else:
+        g.current_user = None
 
 
 @app.route("/generate", methods=["POST"])
@@ -102,9 +113,12 @@ def callback():
         s3_url = (
             f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
         )
-        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id)
-        db.session.add(new_song)
 
+
+        if not g.current_user:
+            return jsonify({"message": "User must be logged in to create a song"}), 401
+        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=g.current_user.id)
+        db.session.add(new_song)
         db.session.commit()
 
     return "Callback processed", 200
@@ -128,6 +142,7 @@ def verify_identity():
         return jsonify({"message": "Incorrect password"}), 400
 
     else:
+        session['user_id'] = existing.id
         return jsonify({"message": "login successful"}), 200
 
 @app.route("/signup", methods=["GET","POST"])
@@ -155,12 +170,15 @@ def create_account():
 
 
 
-@app.route("/api/songs", methods=["GET"])
+@app.route("/api/songs/private", methods=["GET"])
 def api_songs():
-    songs = AISong.query.all()
+    if g.current_user:
+        private_songs = AISong.query.filter_by(user_id=g.current_user.id).all()
+    else:
+        return jsonify({"message": "Please log in"}), 401
 
     result = []
-    for s in songs:
+    for s in private_songs:
         result.append({
             "id": s.id,
             "title": s.title,
@@ -168,6 +186,19 @@ def api_songs():
         })
 
     return jsonify(result), 200
+
+@app.route("/api/songs/public", methods=["GET"])
+def public_songs():
+    songs = AISong.query.filter_by(user_id=None).all()
+    result = []
+    for s in songs:
+        result.append({
+            "id": s.id,
+            "title": s.title,
+            "audio_url": s.audio_url
+        })
+    return jsonify(result), 200
+
 
 
 if __name__ == "__main__":
