@@ -98,8 +98,9 @@ def callback():
     print(f"DATA IS {data}", flush=True)
     print(f"TASK ID FOR CALLBACK IS {task_id}", flush=True)
 
-    if not task_id:
-        return "Missing task_id", 400
+    callback_type = data.get("data", {}).get("callbackType")
+    if callback_type != "complete":
+        return "Waiting for final callback", 200
     
     user_id = task_to_user.pop(task_id, None)
     if not user_id:
