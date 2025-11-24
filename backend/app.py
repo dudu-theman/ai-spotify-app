@@ -28,7 +28,7 @@ s3 = boto3.client(
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173", "https://lofi-app-dc75.onrender.com"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173", "https://lofi-app-dc75.onrender.com", "https://ai-spotify-app.vercel.app"])
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
