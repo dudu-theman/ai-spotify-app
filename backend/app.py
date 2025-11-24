@@ -94,7 +94,7 @@ def generate_song():
 def callback():
     data = request.json or {}
     songs_data = data.get("data", {}).get("data", [])
-    task_id = data.get("taskId")
+    task_id = data.get("task_id")
     print(f"DATA IS {data}", flush=True)
     print(f"TASK ID FOR CALLBACK IS {task_id}", flush=True)
 
