@@ -113,6 +113,7 @@ def callback():
         audio_url = song.get("audio_url")
         if not audio_url:
             print("Skipping missing audio_url for song:", title)
+            return "No audio to download yet", 200
 
         song_id = song.get("id")
         existing = AISong.query.filter_by(song_id=song_id).first()
