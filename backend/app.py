@@ -148,6 +148,7 @@ def verify_identity():
 @app.route("/signup", methods=["GET","POST"])
 def create_account():
     data = request.get_json()
+    print(data)
 
     if not data:
         return jsonify({"message": "invalid JSON"}), 500

@@ -26,7 +26,7 @@ function LoginForm() {
                 setError(data.message);
                 return;
             } else {
-                console.log(data.message);
+                console.log("SUCCESSFUL LOGIN");
                 setError("");
                 navigate("/home");
             }
