@@ -84,6 +84,7 @@ def generate_song():
         return jsonify({"message": "Suno API error"}), 500
     
     task_id = response["data"]["taskId"]
+    print(f"GENERATED TASK ID IS {task_id}")
     task_to_user[task_id] = g.current_user.id  # store mapping
 
     return jsonify({"message": "Generation started"}), 200
