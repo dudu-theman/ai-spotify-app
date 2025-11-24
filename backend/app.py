@@ -94,7 +94,7 @@ def generate_song():
 def callback():
     data = request.json or {}
     songs_data = data.get("data", {}).get("data", [])
-    task_id = data.get("data").get("task_id")
+    task_id = data.get("data",{}).get("task_id")
     print(f"DATA IS {data}", flush=True)
     print(f"TASK ID FOR CALLBACK IS {task_id}", flush=True)
 
@@ -121,7 +121,8 @@ def callback():
             return "Already processed", 200
 
 
-        # download MP3 and upload to S3
+        # download MP3 and upload to S3  
+        print(f"{audio_url}", flush=True)
         response = requests.get(audio_url)
         unique_id = str(uuid.uuid4())
         file_name = secure_filename(f"{unique_id}_{title}.mp3")
