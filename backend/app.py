@@ -77,9 +77,6 @@ def load_current_user():
         g.current_user = None
 
 
-task_to_user = {}
-task_status = {} # {task_id : "pending" | "complete" | "error"}
-
 @app.route("/generate", methods=["POST"])
 def generate_song():
     query = request.args.get("q")
@@ -122,7 +119,8 @@ def callback():
         return "Unknown task", 400
     
     if data.get("code") != 200:
-        task_status[task_id] = "error"
+        task.status = "error"
+        db.session.commit()
         return "Callback returned error", 200
 
     if data.get("code") == 200:
@@ -158,10 +156,11 @@ def callback():
             f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
         )
 
-        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=user_id)
+        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=task.user_id)
         db.session.add(new_song)
-        db.session.commit()
         task.status = "complete"
+        db.session.commit()
+        
 
     return "Callback processed", 200
 
