@@ -52,6 +52,11 @@ class Users(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
   
+class Task(db.Model):
+    __tablename__ = "tasks"
+    task_id = db.Column(db.String(100), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # pending | complete | error
 
 
 with app.app_context():
@@ -88,13 +93,14 @@ def generate_song():
     task_id = response["data"]["taskId"]
     print(f"GENERATED TASK ID IS {task_id}",flush=True)
 
-    task_to_user[task_id] = g.current_user.id  # store mapping
-    task_status[task_id] = "pending"
+    new_task = Task(task_id=task_id, user_id=g.current_user.id, status="pending")
+    db.session.add(new_task)
+    db.session.commit()
 
     return jsonify({
         "message": "Generation started",
         "task_id": task_id,
-        "status": task_status[task_id]
+        "status": new_task.status
     }), 200
 
 
@@ -110,8 +116,8 @@ def callback():
     if callback_type != "complete":
         return "Waiting for final callback", 200
     
-    user_id = task_to_user.get(task_id, None)
-    if not user_id:
+    task = Task.query.get(task_id)
+    if not task:
         print("Unknown task_id:", task_id)
         return "Unknown task", 400
     
@@ -155,17 +161,16 @@ def callback():
         new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=user_id)
         db.session.add(new_song)
         db.session.commit()
-
-        task_status[task_id] = "complete"
+        task.status = "complete"
 
     return "Callback processed", 200
 
 @app.route("/task_status/<task_id>", methods=["GET"])
 def get_task_status(task_id):
-    status = task_status.get(task_id)
-    if not status:
+    task = Task.query.get(task_id)
+    if not task:
         return jsonify({"message": "Unknown task"}), 404
-    return jsonify({"task_id": task_id, "status": status}), 200
+    return jsonify({"task_id": task.task_id, "status": task.status}), 200
 
 
 @app.route("/login", methods=["GET","POST"])
