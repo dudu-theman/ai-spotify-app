@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function SearchBar (props) {
     const [query, setQuery] = useState("");
@@ -9,8 +9,13 @@ function SearchBar (props) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!query.trim()) return;
         props.onSearch(query)
     }
+
+    useEffect(() => {
+        if (!props.disabled) setQuery("");
+    }, [props.disabled])
 
     return (
         <form onSubmit={handleSubmit}>
@@ -18,7 +23,7 @@ function SearchBar (props) {
               type="text"
               value={query}
               onChange={handleInputChange}
-              placeholder="Give a prompt to generate a song."
+              placeholder={props.disabled ? "Generating song..." : "Give a prompt to generate a song."}
             />
         </form>
     );

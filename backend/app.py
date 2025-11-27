@@ -73,21 +73,29 @@ def load_current_user():
 
 
 task_to_user = {}
+task_status = {} # {task_id : "pending" | "complete" | "error"}
 
 @app.route("/generate", methods=["POST"])
 def generate_song():
     query = request.args.get("q")
     if not g.current_user:
         return jsonify({"message": "Please log in"}), 401
+    
     response = make_song(query)
     if response.get("code") != 200:
         return jsonify({"message": "Suno API error"}), 500
     
     task_id = response["data"]["taskId"]
     print(f"GENERATED TASK ID IS {task_id}",flush=True)
-    task_to_user[task_id] = g.current_user.id  # store mapping
 
-    return jsonify({"message": "Generation started"}), 200
+    task_to_user[task_id] = g.current_user.id  # store mapping
+    task_status[task_id] = "pending"
+
+    return jsonify({
+        "message": "Generation started",
+        "task_id": task_id,
+        "status": task_status[task_id]
+    }), 200
 
 
 @app.route("/callback", methods=["POST"])
@@ -106,12 +114,14 @@ def callback():
     if not user_id:
         print("Unknown task_id:", task_id)
         return "Unknown task", 400
+    
+    task_status[task_id] = "error"
 
     if data.get("code") == 200:
         song = songs_data[0]
-
         title = song.get("title","Song is missing title")
         audio_url = song.get("audio_url")
+
         if not audio_url:
             print("Skipping missing audio_url for song:", title)
             return "No audio to download yet", 200
@@ -144,7 +154,17 @@ def callback():
         db.session.add(new_song)
         db.session.commit()
 
+        task_status[task_id] = "complete"
+
     return "Callback processed", 200
+
+@app.route("/task_status/<task_id>", methods=["GET"])
+def get_task_status(task_id):
+    status = task_status.get(task_id)
+    if not status:
+        return jsonify({"message": "Unknown task"}), 404
+    return jsonify({"task_id": task_id, "status": status}), 200
+
 
 @app.route("/login", methods=["GET","POST"])
 def verify_identity():
@@ -228,3 +248,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
+# IMPLEMENT OVER BREAK
+# 1. disable song creation while one is already in process
+# 2. create aleart for when song is generating
+# 3. add libarary of public songs
