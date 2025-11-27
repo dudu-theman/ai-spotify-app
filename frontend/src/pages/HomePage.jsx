@@ -1,4 +1,3 @@
-import GenSongButton from '../components/GenSongButton.jsx'
 import ViewSongsButton from '../components/ViewSongsButton.jsx'
 
 function HomePage() {
