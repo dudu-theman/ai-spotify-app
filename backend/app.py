@@ -110,7 +110,7 @@ def callback():
     if callback_type != "complete":
         return "Waiting for final callback", 200
     
-    user_id = task_to_user.pop(task_id, None)
+    user_id = task_to_user.get(task_id, None)
     if not user_id:
         print("Unknown task_id:", task_id)
         return "Unknown task", 400
