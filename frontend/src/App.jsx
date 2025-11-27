@@ -33,19 +33,27 @@ function App() {
     }
   };
 
-  const waitForCompletion = async (task_id) => {
+  const waitForCompletion = (task_id) => {
     const check = async () => {
-      const res = await fetch(`${BASE_URL}/task-status/${task_id}`, {
-        credentials: "include",
-      });
-      const data = await res.json();
+      try {
+        const res = await fetch(`${BASE_URL}/task-status/${task_id}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
 
-      if (data.status === "complete") {
-        alert("Song finished generating!");
-        setIsGenerating(false);
-        return;
+        if (data.status === "complete") {
+          alert("Song finished generating!");
+          setIsGenerating(false);
+        } else if (data.status === "pending") {
+          setTimeout(check, 2000); 
+        } else {
+          console.error("Unknown task status:", data.status);
+          setIsGenerating(false);
+        }
+      } catch (err) {
+        console.error("Error checking task status:", err);
+        setTimeout(check, 2000); 
       }
-      setTimeout(check, 2000);
     };
     check();
   };

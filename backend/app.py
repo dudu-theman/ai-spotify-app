@@ -115,7 +115,9 @@ def callback():
         print("Unknown task_id:", task_id)
         return "Unknown task", 400
     
-    task_status[task_id] = "error"
+    if data.get("code") != 200:
+        task_status[task_id] = "error"
+        return "Callback returned error", 200
 
     if data.get("code") == 200:
         song = songs_data[0]
