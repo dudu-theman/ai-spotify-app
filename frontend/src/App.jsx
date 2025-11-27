@@ -35,7 +35,7 @@ function App() {
   const waitForCompletion = (task_id) => {
     const check = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/task-status/${task_id}`, {
+        const res = await fetch(`${BASE_URL}/task_status/${task_id}`, {
           credentials: "include",
         });
         const data = await res.json();
