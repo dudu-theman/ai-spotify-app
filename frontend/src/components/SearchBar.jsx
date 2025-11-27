@@ -24,6 +24,7 @@ function SearchBar (props) {
               value={query}
               onChange={handleInputChange}
               placeholder={props.disabled ? "Generating song..." : "Give a prompt to generate a song."}
+              disabled={props.disabled}
             />
         </form>
     );
