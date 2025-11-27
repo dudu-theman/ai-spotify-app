@@ -45,9 +45,9 @@ function App() {
         setIsGenerating(false);
         return;
       }
-      setTimeout(poll, 2000);
+      setTimeout(check, 2000);
     };
-    poll();
+    check();
   };
 
   const location = useLocation();
