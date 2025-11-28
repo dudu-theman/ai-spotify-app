@@ -60,7 +60,7 @@ class Task(db.Model):
 
 
 with app.app_context():
-    db.drop_all()
+  #  db.drop_all()
     db.create_all()
 
 
@@ -216,6 +216,11 @@ def create_account():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User created successfully"}), 200
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
 
 
 

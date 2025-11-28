@@ -6,25 +6,16 @@ function SignOutButton() {
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
-        console.log("Sign Out button clicked!");
-        console.log("BASE_URL:", BASE_URL);
-
         try {
             const res = await fetch(`${BASE_URL}/logout`, {
                 method: "POST",
                 credentials: "include"
             });
 
-            console.log("Response status:", res.status);
-            console.log("Response ok:", res.ok);
-
             if (res.ok) {
-                console.log("Navigating to /auth");
                 navigate("/auth");
             } else {
-                console.error("Sign out failed with status:", res.status);
-                const data = await res.json();
-                console.error("Error data:", data);
+                console.error("Sign out failed");
             }
         } catch (err) {
             console.error("Error signing out:", err);
