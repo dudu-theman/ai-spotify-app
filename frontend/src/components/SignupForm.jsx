@@ -37,12 +37,47 @@ function SignupForm(props) {
     }
 
 
+    const styles = {
+        form: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+        },
+        title: {
+            textAlign: 'center',
+            marginBottom: '8px',
+            fontSize: '24px',
+            color: '#ffffff'
+        },
+        input: {
+            backgroundColor: '#2a2a2a',
+            border: '2px solid #444444',
+            color: '#ffffff',
+            padding: '12px 16px',
+            borderRadius: '4px',
+            fontSize: '16px',
+            width: '100%'
+        },
+        submitButton: {
+            marginTop: '8px',
+            width: '100%'
+        },
+        error: {
+            color: '#ff4444',
+            textAlign: 'center',
+            marginTop: '16px',
+            fontSize: '14px',
+            fontWeight: '500'
+        }
+    };
+
     return(
         <>
-            <form onSubmit={handleSubmit}>
-                <h3>Sign Up</h3>
-                
+            <form onSubmit={handleSubmit} style={styles.form}>
+                <h3 style={styles.title}>Sign Up</h3>
+
                 <input
+                    style={styles.input}
                     type="text"
                     placeholder="Username"
                     value={username}
@@ -50,17 +85,18 @@ function SignupForm(props) {
                     required
                 />
                 <input
+                    style={styles.input}
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button type="submit">
+                <button type="submit" style={styles.submitButton}>
                     Create Account
                 </button>
             </form>
 
-            {error && <p>{error}</p>}
+            {error && <p style={styles.error}>{error}</p>}
         </>
     );
 }
