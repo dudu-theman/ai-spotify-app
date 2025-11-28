@@ -8,10 +8,10 @@ function HomePage() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: '40px 20px',
+      padding: '60px 20px 100px',
       textAlign: 'center',
-      position: 'relative'
+      position: 'relative',
+      backgroundColor: '#0a0a0a'
     },
     signOutContainer: {
       position: 'absolute',
@@ -21,7 +21,8 @@ function HomePage() {
     title: {
       fontSize: '72px',
       fontWeight: 'bold',
-      marginBottom: '24px',
+      marginBottom: '16px',
+      marginTop: '40px',
       background: 'linear-gradient(135deg, #1db954 0%, #1ed760 100%)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
@@ -30,7 +31,7 @@ function HomePage() {
     },
     subtitle: {
       fontSize: '20px',
-      color: 'var(--text-secondary)',
+      color: '#e0e0e0',
       marginBottom: '48px',
       maxWidth: '600px'
     }
@@ -42,7 +43,7 @@ function HomePage() {
         <SignOutButton />
       </div>
       <h1 style={styles.title}>AI Music Generator</h1>
-      <p style={styles.subtitle}>Create unique, AI-generated music with just a prompt. Explore your creations or discover songs from the community.</p>
+      <p style={styles.subtitle}>Create unique, AI-generated instrumentals with just a prompt. Explore your creations or discover songs from the community.</p>
       <ViewSongsButton/>
     </div>
   );

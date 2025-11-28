@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { useAudioPlayer } from "../contexts/AudioPlayerContext";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function SignOutButton() {
     const navigate = useNavigate();
+    const { pauseSong } = useAudioPlayer();
 
     const handleSignOut = async () => {
         try {
@@ -13,6 +15,7 @@ function SignOutButton() {
             });
 
             if (res.ok) {
+                pauseSong();
                 navigate("/auth");
             } else {
                 console.error("Sign out failed");
@@ -25,9 +28,9 @@ function SignOutButton() {
     const styles = {
         button: {
             padding: '10px 24px',
-            backgroundColor: 'transparent',
-            border: '2px solid var(--error-color)',
-            color: 'var(--error-color)',
+            backgroundColor: 'rgba(226, 33, 52, 0.1)',
+            border: '2px solid #e22134',
+            color: '#ffffff',
             fontSize: '14px',
             fontWeight: '600'
         }

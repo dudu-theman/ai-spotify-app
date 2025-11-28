@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SignOutButton from "../components/SignOutButton";
+import { useAudioPlayer } from "../contexts/AudioPlayerContext";
 
 function ShowSongs() {
     const [songs, setSongs] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
+    const { playSong, currentSong, isPlaying } = useAudioPlayer();
 
     // read the query param: "private" or "public"
     const params = new URLSearchParams(location.search);
@@ -32,35 +34,40 @@ function ShowSongs() {
 
     const styles = {
         container: {
-            padding: '40px 20px',
+            padding: '40px 20px 100px',
             maxWidth: '1200px',
-            margin: '0 auto'
+            margin: '0 auto',
+            backgroundColor: '#0a0a0a',
+            minHeight: '100vh'
         },
         header: {
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             gap: '20px',
-            marginBottom: '32px',
-            flexWrap: 'wrap'
-        },
-        headerLeft: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            flex: 1,
-            flexWrap: 'wrap'
+            marginBottom: '48px',
+            flexWrap: 'wrap',
+            position: 'relative'
         },
         backButton: {
             padding: '10px 24px',
-            backgroundColor: 'transparent',
-            border: '2px solid var(--border-color)',
-            color: 'var(--text-secondary)',
-            fontSize: '14px'
+            backgroundColor: 'rgba(29, 185, 84, 0.1)',
+            border: '2px solid #1db954',
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: '600'
+        },
+        titleContainer: {
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center'
         },
         title: {
             fontSize: '48px',
             fontWeight: 'bold',
-            margin: 0
+            margin: 0,
+            color: '#ffffff'
         },
         songsGrid: {
             display: 'grid',
@@ -68,42 +75,53 @@ function ShowSongs() {
             gap: '24px'
         },
         songCard: {
-            backgroundColor: 'var(--bg-secondary)',
+            backgroundColor: '#1a1a1a',
             padding: '24px',
             borderRadius: '8px',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            border: '2px solid transparent'
+        },
+        songCardActive: {
+            border: '2px solid #1db954',
+            boxShadow: '0 4px 12px rgba(29, 185, 84, 0.3)'
         },
         songTitle: {
             fontSize: '18px',
             fontWeight: '600',
             marginBottom: '16px',
-            color: 'var(--text-primary)'
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
         },
-        audioPlayer: {
-            width: '100%',
-            borderRadius: '4px'
+        playIcon: {
+            color: '#1db954',
+            fontSize: '16px'
         },
         emptyState: {
             textAlign: 'center',
             padding: '60px 20px',
-            color: 'var(--text-secondary)'
+            color: '#ffffff',
+            fontSize: '18px'
         }
     };
 
     return (
         <div style={styles.container}>
             <div style={styles.header}>
-                <div style={styles.headerLeft}>
-                    <button
-                        style={styles.backButton}
-                        onClick={() => navigate("/home")}
-                    >
-                        ← Back to Home
-                    </button>
+                <button
+                    style={styles.backButton}
+                    onClick={() => navigate("/home")}
+                >
+                    ← Back to Home
+                </button>
+
+                <div style={styles.titleContainer}>
                     <h2 style={styles.title}>{type === "public" ? "Public Songs" : "Your Songs"}</h2>
                 </div>
+
                 <SignOutButton />
             </div>
 
@@ -113,27 +131,40 @@ function ShowSongs() {
                 </div>
             ) : (
                 <div style={styles.songsGrid}>
-                    {songs.map(song => (
-                        <div
-                            key={song.id}
-                            style={styles.songCard}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-4px)';
-                                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.5)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-                            }}
-                        >
-                            <h3 style={styles.songTitle}>{song.title}</h3>
-                            <audio
-                                style={styles.audioPlayer}
-                                src={song.audio_url}
-                                controls
-                            />
-                        </div>
-                    ))}
+                    {songs.map(song => {
+                        const isCurrentSong = currentSong?.id === song.id;
+                        const cardStyle = isCurrentSong
+                            ? {...styles.songCard, ...styles.songCardActive}
+                            : styles.songCard;
+
+                        return (
+                            <div
+                                key={song.id}
+                                style={cardStyle}
+                                onClick={() => playSong(song)}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = isCurrentSong
+                                        ? '0 8px 20px rgba(29, 185, 84, 0.4)'
+                                        : '0 8px 20px rgba(0, 0, 0, 0.5)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = isCurrentSong
+                                        ? '0 4px 12px rgba(29, 185, 84, 0.3)'
+                                        : '0 4px 12px rgba(0, 0, 0, 0.3)';
+                                }}
+                            >
+                                <h3 style={styles.songTitle}>
+                                    {isCurrentSong && isPlaying && <span style={styles.playIcon}>♫</span>}
+                                    {song.title}
+                                </h3>
+                                <p style={{color: '#b3b3b3', fontSize: '14px', margin: 0}}>
+                                    Click to play
+                                </p>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>

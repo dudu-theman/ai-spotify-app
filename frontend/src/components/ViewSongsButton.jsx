@@ -12,14 +12,20 @@ function ViewSongsButton() {
         },
         primaryButton: {
             padding: '14px 40px',
-            fontSize: '16px'
+            fontSize: '16px',
+            backgroundColor: '#1db954',
+            color: '#000000',
+            fontWeight: '700',
+            boxShadow: '0 0 20px rgba(29, 185, 84, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)'
         },
         secondaryButton: {
             padding: '14px 40px',
             fontSize: '16px',
-            backgroundColor: 'transparent',
-            border: '2px solid var(--accent-primary)',
-            color: 'var(--accent-primary)'
+            backgroundColor: 'rgba(29, 185, 84, 0.15)',
+            border: '2px solid #1db954',
+            color: '#1ed760',
+            fontWeight: '600',
+            boxShadow: '0 0 20px rgba(29, 185, 84, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3)'
         }
     };
 

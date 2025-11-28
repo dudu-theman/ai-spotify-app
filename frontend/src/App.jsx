@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage.jsx";
 import ShowSongs from "./pages/ShowSongs.jsx";
 import SearchBar from "./components/SearchBar.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
+import MusicPlayer from "./components/MusicPlayer.jsx";
 
 const BASE_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -61,6 +62,7 @@ function App() {
 
   const location = useLocation();
   const showSearchBar = location.pathname !== "/auth";
+  const showMusicPlayer = location.pathname !== "/auth";
 
   return (
     <>
@@ -71,6 +73,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/showsongs" element={<ShowSongs/>}/>
       </Routes>
+      {showMusicPlayer && <MusicPlayer />}
     </>
   );
 }
