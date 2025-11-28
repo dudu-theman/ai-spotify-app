@@ -35,8 +35,6 @@ function ShowSongs() {
     const styles = {
         container: {
             padding: '40px 20px 100px',
-            maxWidth: '1200px',
-            margin: '0 auto',
             backgroundColor: '#0a0a0a',
             minHeight: '100vh'
         },
