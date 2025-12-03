@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function SearchBar (props) {
     const [query, setQuery] = useState("");
     const [isFocused, setIsFocused] = useState(false);
+    const prevDisabledRef = useRef(props.disabled);
 
     const handleInputChange = (e) => {
         setQuery(e.target.value)
@@ -15,7 +16,12 @@ function SearchBar (props) {
     }
 
     useEffect(() => {
-        if (!props.disabled) setQuery("");
+        if (prevDisabledRef.current && !props.disabled) {
+            // Clear query when component becomes enabled after being disabled
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setQuery("");
+        }
+        prevDisabledRef.current = props.disabled;
     }, [props.disabled])
 
     const styles = {

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useRef, useEffect } from 'react';
 
 const AudioPlayerContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAudioPlayer() {
     const context = useContext(AudioPlayerContext);
     if (!context) {

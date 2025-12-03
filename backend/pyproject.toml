@@ -1,0 +1,10 @@
+[tool.black]
+line-length = 127
+target-version = ['py311']
+exclude = '''
+/(
+    __pycache__
+  | \.git
+  | helper_functions/__pycache__
+)/
+'''

@@ -31,7 +31,7 @@ function SignupForm(props) {
                 props.onSignupSuccess();
             }
 
-        } catch (err) {
+        } catch {
             setError("Unexpected error ocurred");
         }
     }
