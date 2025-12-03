@@ -23,7 +23,7 @@ function App() {
 
       const data = await res.json();
       console.log("Results:", data);
-      alert("Song is generating. YOU WILL BE ALERTED WHEN SONG IS DONE GENERATING.");
+      alert("Song is generating. THIS MAY TAKE A COUPLE OF MINUTES.");
       waitForCompletion(data.task_id);
 
     } catch (error) {
