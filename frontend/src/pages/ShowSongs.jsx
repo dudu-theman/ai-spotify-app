@@ -32,6 +32,33 @@ function ShowSongs() {
         loadSongs();
     }, [type]); // reload when type changes
 
+    const handleToggleVisibility = async (songId) => {
+        try {
+            const res = await fetch(
+                `https://lofi-app-dc75.onrender.com/api/songs/${songId}/toggle`,
+                {
+                    method: "PUT",
+                    credentials: "include"
+                }
+            );
+
+            if (res.ok) {
+                const data = await res.json();
+                // Update local state
+                setSongs(songs.map(song =>
+                    song.id === songId
+                        ? { ...song, is_public: data.is_public }
+                        : song
+                ));
+            } else {
+                alert("Failed to toggle song visibility");
+            }
+        } catch (error) {
+            console.error("Error toggling visibility:", error);
+            alert("Error toggling song visibility");
+        }
+    };
+
     const styles = {
         container: {
             padding: '40px 20px 100px',
@@ -103,6 +130,31 @@ function ShowSongs() {
             padding: '60px 20px',
             color: '#ffffff',
             fontSize: '18px'
+        },
+        toggleButton: {
+            marginTop: '12px',
+            padding: '8px 16px',
+            border: '2px solid',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            backgroundColor: 'transparent'
+        },
+        toggleButtonPublic: {
+            borderColor: '#1db954',
+            color: '#1db954'
+        },
+        toggleButtonPrivate: {
+            borderColor: '#b3b3b3',
+            color: '#b3b3b3'
+        },
+        username: {
+            color: '#b3b3b3',
+            fontSize: '14px',
+            marginTop: '8px',
+            fontStyle: 'italic'
         }
     };
 
@@ -157,9 +209,37 @@ function ShowSongs() {
                                     {isCurrentSong && isPlaying && <span style={styles.playIcon}>♫</span>}
                                     {song.title}
                                 </h3>
+
+                                {type === "public" && song.username && (
+                                    <p style={styles.username}>
+                                        by @{song.username}
+                                    </p>
+                                )}
+
                                 <p style={{color: '#b3b3b3', fontSize: '14px', margin: 0}}>
                                     Click to play
                                 </p>
+
+                                {type === "private" && (
+                                    <button
+                                        style={{
+                                            ...styles.toggleButton,
+                                            ...(song.is_public ? styles.toggleButtonPublic : styles.toggleButtonPrivate)
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleToggleVisibility(song.id);
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.opacity = '0.8';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.opacity = '1';
+                                        }}
+                                    >
+                                        {song.is_public ? "🌍 Public" : "🔒 Private"}
+                                    </button>
+                                )}
                             </div>
                         );
                     })}

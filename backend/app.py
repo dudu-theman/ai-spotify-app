@@ -46,6 +46,7 @@ class AISong(db.Model):
     audio_url = db.Column(db.String(300))
     song_id = db.Column(db.String(300))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    is_public = db.Column(db.Boolean, default=False, nullable=False)
     owner = db.relationship("Users", backref="songs")
 
 
@@ -65,6 +66,15 @@ class Task(db.Model):
 
 with app.app_context():
     db.create_all()
+    # One-time migration: add is_public column if it doesn't exist
+    try:
+        db.session.execute(db.text("ALTER TABLE ai_song ADD COLUMN is_public BOOLEAN DEFAULT FALSE"))
+        db.session.commit()
+        print("Added is_public column to ai_song table")
+    except Exception as e:
+        db.session.rollback()
+        # Column probably already exists, which is fine
+        pass
 
 
 @app.route("/", methods=["GET"])
@@ -148,7 +158,7 @@ def callback():
         # construct S3 URL and save in DB
         s3_url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
 
-        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=task.user_id)
+        new_song = AISong(title=title, audio_url=s3_url, song_id=song_id, user_id=task.user_id, is_public=False)
         db.session.add(new_song)
         task.status = "complete"
         db.session.commit()
@@ -225,17 +235,36 @@ def api_songs():
 
     result = []
     for s in private_songs:
-        result.append({"id": s.id, "title": s.title, "audio_url": s.audio_url})
+        result.append({"id": s.id, "title": s.title, "audio_url": s.audio_url, "is_public": s.is_public})
 
     return jsonify(result), 200
 
 
+@app.route("/api/songs/<int:song_id>/toggle", methods=["PUT"])
+def toggle_song_visibility(song_id):
+    if not g.current_user:
+        return jsonify({"message": "Please log in"}), 401
+
+    song = AISong.query.get(song_id)
+    if not song:
+        return jsonify({"message": "Song not found"}), 404
+
+    if song.user_id != g.current_user.id:
+        return jsonify({"message": "You don't own this song"}), 403
+
+    song.is_public = not song.is_public
+    db.session.commit()
+
+    return jsonify({"message": "Visibility toggled", "is_public": song.is_public}), 200
+
+
 @app.route("/api/songs/public", methods=["GET"])
 def public_songs():
-    songs = AISong.query.filter_by(user_id=None).all()
+    songs = AISong.query.filter_by(is_public=True).all()
     result = []
     for s in songs:
-        result.append({"id": s.id, "title": s.title, "audio_url": s.audio_url})
+        username = s.owner.username if s.owner else "Unknown"
+        result.append({"id": s.id, "title": s.title, "audio_url": s.audio_url, "username": username})
     return jsonify(result), 200
 
 
