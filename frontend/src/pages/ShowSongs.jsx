@@ -32,7 +32,7 @@ function ShowSongs() {
         loadSongs();
     }, [type]); // reload when type changes
 
-    const handleToggleVisibility = async (songId, currentStatus) => {
+    const handleToggleVisibility = async (songId) => {
         try {
             const res = await fetch(
                 `https://lofi-app-dc75.onrender.com/api/songs/${songId}/toggle`,
@@ -228,7 +228,7 @@ function ShowSongs() {
                                         }}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleToggleVisibility(song.id, song.is_public);
+                                            handleToggleVisibility(song.id);
                                         }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.opacity = '0.8';
