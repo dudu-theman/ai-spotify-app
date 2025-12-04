@@ -42,7 +42,7 @@ function HomePage() {
       <div style={styles.signOutContainer}>
         <SignOutButton />
       </div>
-      <h1 style={styles.title}>AI Music Generator</h1>
+      <h1 style={styles.title}>AI Lofi Music</h1>
       <p style={styles.subtitle}>Create unique, AI-generated instrumentals with just a prompt. Explore your creations or discover songs from the community.</p>
       <ViewSongsButton/>
     </div>

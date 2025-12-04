@@ -113,7 +113,7 @@ function ShowSongs() {
             boxShadow: '0 4px 12px rgba(29, 185, 84, 0.3)'
         },
         songTitle: {
-            fontSize: '18px',
+            fontSize: '22px',
             fontWeight: '600',
             marginBottom: '16px',
             color: '#ffffff',
@@ -131,24 +131,49 @@ function ShowSongs() {
             color: '#ffffff',
             fontSize: '18px'
         },
-        toggleButton: {
-            marginTop: '12px',
-            padding: '8px 16px',
-            border: '2px solid',
-            borderRadius: '20px',
+        toggleContainer: {
+            marginTop: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+        },
+        toggleSwitch: {
+            position: 'relative',
+            width: '44px',
+            height: '22px',
+            borderRadius: '11px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)'
+        },
+        toggleSwitchPrivate: {
+            backgroundColor: '#dc3545'
+        },
+        toggleSwitchPublic: {
+            backgroundColor: '#1db954'
+        },
+        toggleSlider: {
+            position: 'absolute',
+            top: '2px',
+            width: '18px',
+            height: '18px',
+            borderRadius: '50%',
+            backgroundColor: '#ffffff',
+            transition: 'transform 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.4)'
+        },
+        toggleSliderLeft: {
+            left: '2px',
+            transform: 'translateX(0)'
+        },
+        toggleSliderRight: {
+            left: '2px',
+            transform: 'translateX(22px)'
+        },
+        toggleLabel: {
             fontSize: '13px',
             fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            backgroundColor: 'transparent'
-        },
-        toggleButtonPublic: {
-            borderColor: '#1db954',
-            color: '#1db954'
-        },
-        toggleButtonPrivate: {
-            borderColor: '#b3b3b3',
-            color: '#b3b3b3'
+            color: '#ffffff'
         },
         username: {
             color: '#b3b3b3',
@@ -221,24 +246,41 @@ function ShowSongs() {
                                 </p>
 
                                 {type === "private" && (
-                                    <button
-                                        style={{
-                                            ...styles.toggleButton,
-                                            ...(song.is_public ? styles.toggleButtonPublic : styles.toggleButtonPrivate)
-                                        }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleToggleVisibility(song.id);
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.opacity = '0.8';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.opacity = '1';
-                                        }}
-                                    >
-                                        {song.is_public ? "🌍 Public" : "🔒 Private"}
-                                    </button>
+                                    <div style={styles.toggleContainer}>
+                                        <span style={{
+                                            ...styles.toggleLabel,
+                                            opacity: song.is_public ? 0.5 : 1
+                                        }}>
+                                            🔒 Private
+                                        </span>
+                                        <div
+                                            style={{
+                                                ...styles.toggleSwitch,
+                                                ...(song.is_public ? styles.toggleSwitchPublic : styles.toggleSwitchPrivate)
+                                            }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleToggleVisibility(song.id);
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.opacity = '0.9';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.opacity = '1';
+                                            }}
+                                        >
+                                            <div style={{
+                                                ...styles.toggleSlider,
+                                                ...(song.is_public ? styles.toggleSliderRight : styles.toggleSliderLeft)
+                                            }} />
+                                        </div>
+                                        <span style={{
+                                            ...styles.toggleLabel,
+                                            opacity: song.is_public ? 1 : 0.5
+                                        }}>
+                                            🌍 Public
+                                        </span>
+                                    </div>
                                 )}
                             </div>
                         );
