@@ -1,11 +1,12 @@
-# import requests
 from dotenv import load_dotenv
 import os
 import requests
 from anthropic import Anthropic
+from helper_functions.model_utils import generate_title_with_fallback
 
 load_dotenv()
 
+# Claude client (used as fallback if QWEN model fails)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
@@ -47,17 +48,25 @@ def make_song(query):
 
 
 def make_title_name(query):
-    prompt = (
-        f"I am generating a song with the following prompt: <prompt>{query}</prompt>. "
-        "Come up with a short title name for the song. Only give me the title of the song, "
-        "and nothing else. For example:\n"
-        "prompt: 'Upbeat instrumental beat with great vibes' response: 'Energy Overload'"
-    )
-    response = client.messages.create(
-        model="claude-3-haiku-20240307", max_tokens=50, messages=[{"role": "user", "content": f"{prompt}"}], temperature=1
-    )
-    return response.content[0].text
+    """
+    Generate song title using fine-tuned QWEN model or Claude fallback.
+    Model selection controlled by USE_FINETUNED_MODEL env var.
+    """
+    def claude_fallback(prompt):
+        """Claude API fallback if QWEN model fails or is disabled."""
+        system_prompt = (
+            f"I am generating a song with the following prompt: <prompt>{prompt}</prompt>. "
+            "Come up with a short title name for the song. Only give me the title of the song, "
+            "and nothing else. For example:\n"
+            "prompt: 'Upbeat instrumental beat with great vibes' response: 'Energy Overload'"
+        )
+        response = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=50,
+            messages=[{"role": "user", "content": system_prompt}],
+            temperature=1
+        )
+        return response.content[0].text.strip()
 
-
-print(make_title_name("Calm lofi beat with rain and wind sounds in the background."))
-# train model title
+    # Use QWEN model with Claude fallback
+    return generate_title_with_fallback(query, fallback_func=claude_fallback)
